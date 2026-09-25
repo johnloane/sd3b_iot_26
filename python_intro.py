@@ -1,4 +1,8 @@
 import pyttsx3
+import os
+import google.genai as genai
+from dotenv import load_dotenv, find_dotenv
+from google.genai import types
 
 def main():
     #hello_world()
@@ -6,7 +10,23 @@ def main():
     #get_int()
     #agree()
     #find_name()
-    phone_book()
+    #phone_book()
+    talk_to_gemini()
+    
+    
+def talk_to_gemini():
+    _ = load_dotenv(find_dotenv())
+    gemini_api_key = os.environ["GEMINI_API_KEY"]
+    client = genai.Client(api_key=gemini_api_key)
+    system_prompt = "You are a friendly and supportive lecturer in Dundalk Institute of Technology. You are also succinct."
+    user_prompt = input("What do you want to know: ")
+    llm_model = "gemini-3.5-flash"
+    chat = client.chats.create(model=llm_model)
+    response = chat.send_message(
+    system_prompt+user_prompt)
+    print(response.text)
+
+
     
       
 def hello_world():

@@ -1,0 +1,4 @@
+{%extends "layout.html"%} {% block content%} {% for reading in readings%}
+<h2>{{reading.sensor}}</h2>
+<p>{{reading.content}}</p>
+{% endfor %} {%endblock%}
