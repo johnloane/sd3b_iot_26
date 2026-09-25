@@ -27,7 +27,7 @@ sensor_readings: list[dict] = [
 def home(request: Request):
     return templates.TemplateResponse(request, "home.html", {"sensor_readings" : sensor_readings, "title": "Sensor Readings"})
 
-@app.get("/sensor_readings/{sensor_reading_id}", include_in_schema=False)
+@app.get("/sensor_reading/{sensor_reading_id}", include_in_schema=False)
 def sensor_reading_page(request:Request, sensor_reading_id:int):
     for sensor_reading in sensor_readings:
         if sensor_reading.get("id") == sensor_reading_id:
@@ -41,7 +41,7 @@ def get_sensor_readings():
     return sensor_readings
 
 
-@app.get("/api/sensor_readings/{sensor_reading_id}")
+@app.get("/api/sensor_reading/{sensor_reading_id}")
 def get_sensor_reading(sensor_reading_id:int):
     for sensor_reading in sensor_readings:
         if sensor_reading['id'] == sensor_reading_id:

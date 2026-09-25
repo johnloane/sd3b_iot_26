@@ -16,7 +16,7 @@
           </div>
           <h2>
             <a class="article-title"
-               href="{{ url_for("sensor_readings", sensor_reading_id=sensor_reading.id) }}">{{ sensor_reading.sensor }}</a>
+               href="{{ url_for("sensor_reading_page", sensor_reading_id=sensor_reading.id) }}">{{ sensor_reading.sensor }}</a>
           </h2>
           <p class="article-content">{{ sensor_reading.content }}</p>
         </div>
