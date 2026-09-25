@@ -4,7 +4,7 @@
     <img
       class="rounded-circle article-img flex-shrink-0"
       src="{{ url_for('static', path='profile_pics/default.jpg') }}"
-      alt="{{ post.author }}'s profile picture"
+      alt="{{ sensor_reading.content.author }}'s profile picture"
       width="64"
       height="64"
       loading="lazy"
@@ -16,7 +16,7 @@
           >{{ sensor_reading.date_timestamp }}</small
         >
       </div>
-      <h2 class="article-title">{{ sensor_reading.sensors }}</h2>
+      <h2 class="article-title">{{ sensor_reading.sensor }}</h2>
       <p class="article-content">{{ sensor_reading.content }}</p>
       <!-- Only show edit/delete options if the user is the author -->
       <!-- TODO: Add user authentication and authorization -->

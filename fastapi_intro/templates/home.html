@@ -1,4 +1,28 @@
-{%extends "layout.html"%} {% block content%} {% for reading in readings%}
-<h2>{{reading.sensor}}</h2>
-<p>{{reading.content}}</p>
-{% endfor %} {%endblock%}
+{% extends "layout.html" %}
+{% block content %}
+  {% for sensor_reading in sensor_readings %}
+    <article class="content-section py-3 px-4 mb-4">
+      <div class="d-flex align-items-start gap-4">
+        <img class="rounded-circle article-img flex-shrink-0"
+             src="{{ url_for('static', path='profile_pics/default.jpg') }}"
+             alt="{{ sensor_reading.sensor }}'s profile picture"
+             width="64"
+             height="64"
+             loading="lazy">
+        <div class="flex-grow-1">
+          <div class="article-metadata mb-2">
+            <a class="me-2" href="#">{{ sensor_reading.sensor }}</a>
+            <small class="text-body-secondary">{{ sensor_reading.date_timestamp }}</small>
+          </div>
+          <h2>
+            <a class="article-title"
+               href="{{ url_for("sensor_readings", sensor_reading_id=sensor_reading.id) }}">{{ sensor_reading.sensor }}</a>
+          </h2>
+          <p class="article-content">{{ sensor_reading.content }}</p>
+        </div>
+      </div>
+    </article>
+  {% endfor %}
+{% endblock content %}
+
+

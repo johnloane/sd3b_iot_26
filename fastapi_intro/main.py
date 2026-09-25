@@ -25,7 +25,15 @@ sensor_readings: list[dict] = [
 @app.get("/",  include_in_schema=False, name="home")
 @app.get("/sensor_readings", include_in_schema=False, name="sensor_readings")
 def home(request: Request):
-    return templates.TemplateResponse(request, "home.html", {"readings" : sensor_readings, "title": "Sensor Readings"})
+    return templates.TemplateResponse(request, "home.html", {"sensor_readings" : sensor_readings, "title": "Sensor Readings"})
+
+@app.get("/sensor_readings/{sensor_reading_id}", include_in_schema=False)
+def sensor_reading_page(request:Request, sensor_reading_id:int):
+    for sensor_reading in sensor_readings:
+        if sensor_reading.get("id") == sensor_reading_id:
+            title = sensor_reading['sensor'][:50]
+            return templates.TemplateResponse(request, "sensor_reading.html", {"sensor_reading":sensor_reading, "title":title})
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading id not found")
 
 
 @app.get("/api/sensor_readings")
