@@ -1,6 +1,11 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+
 
 app = FastAPI()
 
@@ -47,3 +52,18 @@ def get_sensor_reading(sensor_reading_id:int):
         if sensor_reading['id'] == sensor_reading_id:
             return sensor_reading
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading id not found")
+
+
+@app.exception_handler(StarletteHTTPException)
+def general_http_exception_handler(request:Request, exception:StarletteHTTPException):
+    message = {
+        exception.detail
+        if exception.detail
+        else "An error occurred. Please check your request and try again"
+    }
+    if request.url.path.startswith("/api"):
+        return JSONResponse(
+            status_code = exception.status_code,
+            content = {"detail": message}
+        )
+    
