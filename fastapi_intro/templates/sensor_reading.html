@@ -3,8 +3,8 @@
   <div class="d-flex align-items-start gap-4">
     <img
       class="rounded-circle article-img flex-shrink-0"
-      src="{{ url_for('static', path='profile_pics/default.jpg') }}"
-      alt="{{ sensor_reading.content.author }}'s profile picture"
+      src="{{ sensor_reading.author.image_path }}"
+      alt="{{ sensor_reading.author.name }}'s profile picture"
       width="64"
       height="64"
       loading="lazy"

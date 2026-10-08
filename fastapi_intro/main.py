@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from schemas import ReadingCreate, ReadingResponse, UserCreate, UserResponse, 
+from schemas import ReadingCreate, ReadingResponse, UserCreate, UserResponse 
 from typing import Annotated
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -23,41 +23,62 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/",  include_in_schema=False, name="home")
 @app.get("/sensor_readings", include_in_schema=False, name="sensor_readings")
-def home(request: Request):
+def home(request: Request, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Reading))
+    sensor_readings = result.scalars().all()
     return templates.TemplateResponse(request, "home.html", {"sensor_readings" : sensor_readings, "title": "Sensor Readings"})
 
 @app.get("/sensor_reading/{sensor_reading_id}", include_in_schema=False)
-def sensor_reading_page(request:Request, sensor_reading_id:int):
-    for sensor_reading in sensor_readings:
-        if sensor_reading.get("id") == sensor_reading_id:
-            title = sensor_reading['sensor'][:50]
-            return templates.TemplateResponse(request, "sensor_reading.html", {"sensor_reading":sensor_reading, "title":title})
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading id not found")
+def sensor_reading_page(request:Request, sensor_reading_id:int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Reading).where(models.Reading.id == sensor_reading_id))
+    sensor_reading = result.scalars().first()
+    if sensor_reading:
+        title = sensor_reading['sensor'][:50]
+        return templates.TemplateResponse(request, "sensor_reading.html", {"sensor_reading":sensor_reading, "title":title})
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading not found")
+
+
+@app.get("/user/{user_id}/readings", include_in_schema=False, name="user_readings")
+def user_readings_page(request:Request, user_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.User).where(models.User.id == user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") 
+    result = db.execute(models.Reading).where(models.Reading.user_id == user_id)
+    readings = result.scalars().all()
+    return templates.TemplateResponse(request, "user_readings.html", {"readings":readings, "user":user, "title":f"{user.username}'s Readings"})
 
 
 @app.get("/api/sensor_readings", response_model=list[ReadingResponse])
-def get_sensor_readings():
+def get_sensor_readings(db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Reading))
+    sensor_readings = result.scalars().all()
     return sensor_readings
 
 
 @app.get("/api/sensor_reading/{sensor_reading_id}", response_model=ReadingResponse)
-def get_sensor_reading(sensor_reading_id:int):
-    for sensor_reading in sensor_readings:
-        if sensor_reading['id'] == sensor_reading_id:
-            return sensor_reading
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading id not found")
+def get_sensor_reading(sensor_reading_id:int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Reading).where(models.Reading.id == sensor_reading_id))
+    reading = result.scalars().first()
+    if reading:
+        return reading
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading not found")
 
 @app.post("/api/reading", response_model=ReadingResponse, status_code = status.HTTP_201_CREATED)
-def create_reading(reading: ReadingCreate):
-    new_id = max(r["id"] for r in sensor_readings) + 1 if sensor_readings else 1
-    new_post = {
-        "id": new_id,
+def create_reading(reading: ReadingCreate, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.User).where(models.User.id == reading.user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    new_reading = {
         "sensor": reading.sensor,
         "content": reading.content,
-        "date_timestamp": "Oct 2, 2026, 12:00"
+        "user_id": reading.user_id
     }
-    sensor_readings.append(new_post)
-    return new_post
+    db.add(new_reading)
+    db.commit()
+    db.refresh(new_reading)
+    return new_reading
 
 
 @app.post("/api/user", response_model=UserResponse, status_code=status.HTTP_201_CREATED)

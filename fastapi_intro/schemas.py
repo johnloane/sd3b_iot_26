@@ -1,6 +1,7 @@
+from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
 from datetime import datetime
-from __future__ import annotations
+
 
 class ReadingBase(BaseModel):
     sensor: str = Field(min_length=1, max_length=20)

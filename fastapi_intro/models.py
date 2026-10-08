@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 
@@ -18,7 +18,7 @@ class Reading(Base):
     __tablename__ = "reading"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     sensor: Mapped[str] = mapped_column(String(20), nullable=False)
-    content: Mapped[float] = mapped_column(float, nullable=False)
+    content: Mapped[float] = mapped_column(Float, nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False, index=True)
     date_timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True),
                                                      default=lambda: datetime.now(UTC))
