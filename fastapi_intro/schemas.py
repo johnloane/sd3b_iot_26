@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
+from datetime import datetime
+from __future__ import annotations
 
 class ReadingBase(BaseModel):
     sensor: str = Field(min_length=1, max_length=20)
@@ -6,13 +8,33 @@ class ReadingBase(BaseModel):
     
     
 class ReadingCreate(ReadingBase):
-    pass 
+    user_id: int #Temporary
 
 
 class ReadingResponse(ReadingBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
-    date_timestamp: str
+    user_id: int
+    date_timestamp: datetime
+    author: UserResponse
+    
+    
+class UserBase(BaseModel):
+    username:str = Field(min_length=3, max_length=20)
+    email: EmailStr = Field(max_length=320)
+    
+    
+class UserCreate(UserBase):
+    pass 
+
+class UserResponse(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    image_file: str | None
+    image_path: str
+    
+    
+    
     
 
 
