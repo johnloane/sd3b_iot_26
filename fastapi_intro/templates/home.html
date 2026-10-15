@@ -5,13 +5,13 @@
       <div class="d-flex align-items-start gap-4">
         <img class="rounded-circle article-img flex-shrink-0"
              src="{{ sensor_reading.author.image_path}}"
-             alt="{{ sensor_reading.author.name }}'s profile picture"
+             alt="{{ sensor_reading.author.username }}'s profile picture"
              width="64"
              height="64"
              loading="lazy">
         <div class="flex-grow-1">
           <div class="article-metadata mb-2">
-            <a class="me-2" href="{{url_for('user_readings', user_id=reading.author.id)}}">{{ sensor_reading.author.name }}</a>
+            <a class="me-2" href="{{url_for('user_readings', user_id=sensor_reading.author.id)}}">{{ sensor_reading.author.username }}</a>
             <small class="text-body-secondary">{{ sensor_reading.date_timestamp.strftime('%d %B, %Y')}}</small>
           </div>
           <h2>

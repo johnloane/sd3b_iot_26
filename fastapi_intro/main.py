@@ -33,7 +33,7 @@ def sensor_reading_page(request:Request, sensor_reading_id:int, db: Annotated[Se
     result = db.execute(select(models.Reading).where(models.Reading.id == sensor_reading_id))
     sensor_reading = result.scalars().first()
     if sensor_reading:
-        title = sensor_reading['sensor'][:50]
+        title = sensor_reading.sensor[:50]
         return templates.TemplateResponse(request, "sensor_reading.html", {"sensor_reading":sensor_reading, "title":title})
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor reading not found")
 
@@ -44,7 +44,7 @@ def user_readings_page(request:Request, user_id: int, db: Annotated[Session, Dep
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") 
-    result = db.execute(models.Reading).where(models.Reading.user_id == user_id)
+    result = db.execute(select(models.Reading).where(models.Reading.user_id == user_id))
     readings = result.scalars().all()
     return templates.TemplateResponse(request, "user_readings.html", {"readings":readings, "user":user, "title":f"{user.username}'s Readings"})
 
@@ -70,11 +70,11 @@ def create_reading(reading: ReadingCreate, db: Annotated[Session, Depends(get_db
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    new_reading = {
-        "sensor": reading.sensor,
-        "content": reading.content,
-        "user_id": reading.user_id
-    }
+    new_reading = models.Reading(
+        sensor = reading.sensor,
+        content = reading.content,
+        user_id = reading.user_id
+    )
     db.add(new_reading)
     db.commit()
     db.refresh(new_reading)
@@ -103,7 +103,7 @@ def create_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
 
 @app.get("/api/user/{user_id}", response_model = UserResponse)
 def get_user(user_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(models.User).where(models.User.id == user_id)
+    result = db.execute(select(models.User).where(models.User.id == user_id))
     user = result.scalars().first()
     if user:
         return user
@@ -124,11 +124,11 @@ def get_user_readings(user_id: int, db: Annotated[Session, Depends(get_db)]):
 
 @app.exception_handler(StarletteHTTPException)
 def general_http_exception_handler(request:Request, exception:StarletteHTTPException):
-    message = {
+    message = (
         exception.detail
         if exception.detail
         else "An error occurred. Please check your request and try again"
-    }
+    )
     if request.url.path.startswith("/api"):
         return JSONResponse(
             status_code = exception.status_code,

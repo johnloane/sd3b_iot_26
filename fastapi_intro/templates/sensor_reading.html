@@ -11,9 +11,9 @@
     />
     <div class="flex-grow-1">
       <div class="article-metadata mb-2">
-        <a class="me-2" href="#">{{ sensor_reading.sensor }}</a>
+        <a class="me-2" href="{{url_for("user_readings", user_id=sensor_reading.author.id)}}">{{ sensor_reading.author.username }}</a>
         <small class="text-body-secondary"
-          >{{ sensor_reading.date_timestamp }}</small
+          >{{ sensor_reading.date_timestamp.strftime("%d %B, %Y") }}</small
         >
       </div>
       <h2 class="article-title">{{ sensor_reading.sensor }}</h2>

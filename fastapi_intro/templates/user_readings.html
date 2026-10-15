@@ -23,13 +23,11 @@
         >
       </div>
       <h2>
-        <a
-          class="article-title"
-          href="{{ url_for('reading_page', reading_id=reading.id) }}"
-          >{{ reading.name }}</a
+        <a class="article-title" href="{{ url_for('get_sensor_readings') }}"
+          >{{ reading.sensor }}</a
         >
       </h2>
-      <p class="article-content">{{ reading.content }}</p>
+      <p class="article-content">{{reading.content }}</p>
     </div>
   </div>
 </article>
