@@ -20,6 +20,11 @@ class ReadingResponse(ReadingBase):
     author: UserResponse
     
     
+class ReadingUpdate(BaseModel):
+    sensor: str | None = Field(default=None, min_length=1, max_length=20)
+    content: float | None = Field(default=None)
+    
+    
 class UserBase(BaseModel):
     username:str = Field(min_length=3, max_length=20)
     email: EmailStr = Field(max_length=320)
@@ -33,6 +38,11 @@ class UserResponse(UserBase):
     id: int
     image_file: str | None
     image_path: str
+    
+class UserUpdate(BaseModel):
+    username:str | None = Field(default=None, min_length=1, max_length=20)
+    email: EmailStr | None = Field(default=None, max_length=320)
+    image_file: str | None = Field(default=None, min_length=1, max_length=200)
     
     
     
