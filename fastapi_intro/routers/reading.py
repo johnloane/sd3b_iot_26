@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[ReadingResponse])
 async def get_sensor_readings(reading: ReadingCreate, db: Annotated[AsyncSession, Depends(get_db)]):
-    result = await db.execute(select(models.Reading).options(selectinload(models.Reading.author)))
+    result = await db.execute(select(models.Reading).options(selectinload(models.Reading.author)).order_by(models.Reading.date_timestamp.desc()))
     sensor_readings = result.scalars().all()
     return sensor_readings
 
