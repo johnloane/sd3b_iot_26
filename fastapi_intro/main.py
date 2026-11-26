@@ -39,7 +39,7 @@ app.include_router(reading.router, prefix="/api/reading", tags=["reading"])
 @app.get("/",  include_in_schema=False, name="home")
 @app.get("/sensor_readings", include_in_schema=False, name="sensor_readings")
 async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
-    result = await db.execute(select(models.Reading).options(selectinload(models.Reading.author)))
+    result = await db.execute(select(models.Reading).options(selectinload(models.Reading.author)).order_by(models.Reading.date_timestamp.desc()))
     sensor_readings = result.scalars().all()
     return templates.TemplateResponse(request, "home.html", {"sensor_readings" : sensor_readings, "title": "Sensor Readings"})
 
@@ -59,7 +59,7 @@ async def user_readings_page(request:Request, user_id: int, db: Annotated[AsyncS
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") 
-    result = await db.execute(select(models.Reading).where(models.Reading.user_id == user_id).options(selectinload(models.Reading.author)))
+    result = await db.execute(select(models.Reading).where(models.Reading.user_id == user_id).options(selectinload(models.Reading.author)).order_by(models.Reading.date_timestamp.desc()))
     readings = result.scalars().all()
     return templates.TemplateResponse(request, "user_readings.html", {"readings":readings, "user":user, "title":f"{user.username}'s Readings"})
 

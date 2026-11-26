@@ -45,7 +45,7 @@ async def get_user_readings(user_id: int, db: Annotated[AsyncSession, Depends(ge
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") 
-    result = await db.execute(models.Reading).where(models.Reading.user_id == user_id.options(selectinload(models.Reading.author)))
+    result = await db.execute(models.Reading).where(models.Reading.user_id == user_id.options(selectinload(models.Reading.author)).order_by(models.Reading.date_timestamp.desc()))
     readings = result.scalars().all()
     return readings
 
